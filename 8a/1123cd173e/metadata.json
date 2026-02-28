@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.4.7",
+  "checkpoint_id": "8a1123cd173e",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "src/app/admin/dishes/new/page.tsx",
+    "src/app/api/dishes/[id]/photos/route.ts",
+    "src/app/api/dishes/route.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/8a/1123cd173e/0/metadata.json",
+      "transcript": "/8a/1123cd173e/0/full.jsonl",
+      "context": "/8a/1123cd173e/0/context.md",
+      "content_hash": "/8a/1123cd173e/0/content_hash.txt",
+      "prompt": "/8a/1123cd173e/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 65505,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 104363,
+    "output_tokens": 6255,
+    "api_call_count": 9
+  }
+}
