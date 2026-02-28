@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { uploadPhoto } from "@/lib/storage";
 
 function getSupabase() {
   return createClient(
@@ -36,16 +35,13 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/dishes
-// FormData: name, description?, price?, restaurantId, photos (1-4 files)
+// JSON: { name, description?, price?, restaurantId }
+// Photos are uploaded directly from the browser — see POST /api/dishes/[id]/photos
 export async function POST(request: NextRequest) {
   const supabase = getSupabase();
-  const formData = await request.formData();
+  const body = await request.json();
 
-  const name = formData.get("name") as string;
-  const description = formData.get("description") as string | null;
-  const price = formData.get("price") as string | null;
-  const restaurantId = formData.get("restaurantId") as string;
-  const photos = formData.getAll("photos") as File[];
+  const { name, description, price, restaurantId } = body;
 
   if (!name || !restaurantId) {
     return NextResponse.json(
@@ -54,21 +50,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (photos.length < 1 || photos.length > 4) {
-    return NextResponse.json(
-      { error: "1–4 photos are required" },
-      { status: 400 }
-    );
-  }
-
-  // Create the dish record
   const { data: dish, error: dishError } = await supabase
     .from("dishes")
     .insert({
       restaurant_id: restaurantId,
       name,
       description: description || null,
-      price: price ? parseFloat(price) : null,
+      price: price ?? null,
       model_status: "pending",
     })
     .select()
@@ -77,25 +65,6 @@ export async function POST(request: NextRequest) {
   if (dishError || !dish) {
     return NextResponse.json(
       { error: dishError?.message ?? "Failed to create dish" },
-      { status: 500 }
-    );
-  }
-
-  // Upload photos and create dish_photo records
-  const photoInserts = await Promise.all(
-    photos.map(async (file, i) => {
-      const url = await uploadPhoto(restaurantId, dish.id, file, i);
-      return { dish_id: dish.id, photo_url: url, sort_order: i };
-    })
-  );
-
-  const { error: photosError } = await supabase
-    .from("dish_photos")
-    .insert(photoInserts);
-
-  if (photosError) {
-    return NextResponse.json(
-      { error: `Photos saved but metadata failed: ${photosError.message}` },
       { status: 500 }
     );
   }

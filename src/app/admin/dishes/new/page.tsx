@@ -3,8 +3,28 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import PhotoUpload from "@/components/PhotoUpload";
+import { createClient } from "@/lib/supabase/client";
 
 const DEMO_RESTAURANT_ID = process.env.NEXT_PUBLIC_DEMO_RESTAURANT_ID ?? "";
+
+async function uploadPhotoToSupabase(
+  file: File,
+  dishId: string,
+  sortOrder: number
+): Promise<string> {
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `${DEMO_RESTAURANT_ID}/${dishId}/${sortOrder}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("photos")
+    .upload(path, file, { contentType: file.type, upsert: true });
+
+  if (error) throw new Error(`Photo upload failed: ${error.message}`);
+
+  const { data } = supabase.storage.from("photos").getPublicUrl(path);
+  return data.publicUrl;
+}
 
 export default function NewDishPage() {
   const router = useRouter();
@@ -13,6 +33,7 @@ export default function NewDishPage() {
   const [price, setPrice] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,17 +45,17 @@ export default function NewDishPage() {
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.set("name", name.trim());
-      formData.set("restaurantId", DEMO_RESTAURANT_ID);
-      if (description.trim()) formData.set("description", description.trim());
-      if (price) formData.set("price", price);
-      photos.forEach((f) => formData.append("photos", f));
-
-      // Create dish + upload photos
+      // Step 1: Create the dish record (no files, just metadata)
+      setLoadingStatus("Creating dish…");
       const res = await fetch("/api/dishes", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          description: description.trim() || null,
+          price: price ? parseFloat(price) : null,
+          restaurantId: DEMO_RESTAURANT_ID,
+        }),
       });
 
       if (!res.ok) {
@@ -44,7 +65,27 @@ export default function NewDishPage() {
 
       const dish = await res.json();
 
-      // Kick off 3D generation
+      // Step 2: Upload photos directly from browser to Supabase Storage
+      setLoadingStatus(`Uploading photos…`);
+      const photoUrls = await Promise.all(
+        photos.map((file, i) => uploadPhotoToSupabase(file, dish.id, i))
+      );
+
+      // Step 3: Save photo records
+      setLoadingStatus("Saving photo records…");
+      const photosRes = await fetch(`/api/dishes/${dish.id}/photos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photoUrls }),
+      });
+
+      if (!photosRes.ok) {
+        const data = await photosRes.json();
+        throw new Error(data.error ?? "Failed to save photos");
+      }
+
+      // Step 4: Kick off 3D generation
+      setLoadingStatus("Starting 3D generation…");
       const genRes = await fetch("/api/meshy/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -144,7 +185,7 @@ export default function NewDishPage() {
           disabled={loading || photos.length === 0}
           className="w-full bg-orange-500 text-white py-3 rounded-lg text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? "Creating dish & starting 3D generation…" : "Add dish & generate 3D model"}
+          {loading ? loadingStatus || "Creating dish…" : "Add dish & generate 3D model"}
         </button>
       </form>
     </div>
