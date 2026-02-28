@@ -46,7 +46,9 @@ export async function POST(request: NextRequest) {
     .map((p) => p.photo_url);
 
   // Submit to Meshy
-  const taskId = await createMultiImageTask({ imageUrls });
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  const webhookUrl = appUrl ? `${appUrl}/api/meshy/webhook` : undefined;
+  const taskId = await createMultiImageTask({ imageUrls, webhookUrl });
 
   // Update dish record
   const { error: updateError } = await supabase

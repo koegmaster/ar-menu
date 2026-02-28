@@ -9,6 +9,7 @@ function getHeaders() {
 
 export interface MeshyTaskInput {
   imageUrls: string[]; // 1–4 public image URLs
+  webhookUrl?: string;
   targetPolycount?: number;
   enablePbr?: boolean;
 }
@@ -62,6 +63,7 @@ export async function createMultiImageTask(
     target_polycount: input.targetPolycount ?? 30000,
     symmetry_mode: "auto",
     style_enhancement: false, // preserve photorealism for food
+    ...(input.webhookUrl ? { webhook_url: input.webhookUrl } : {}),
   };
 
   const res = await fetch(`${MESHY_BASE_URL}/openapi/v1/multi-image-to-3d`, {
