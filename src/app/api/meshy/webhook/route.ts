@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
   uploadModelFromUrl,
   uploadThumbnailFromUrl,
+  getPublicUrl,
+  BUCKETS,
 } from "@/lib/storage";
 import type { MeshyTask } from "@/lib/meshy";
 
@@ -14,7 +17,8 @@ function getSupabase() {
 }
 
 // POST /api/meshy/webhook
-// Called by Meshy when a task status changes
+// Called by Meshy when a task status changes. Responds immediately and
+// migrates model files to Supabase Storage in the background via after().
 export async function POST(request: NextRequest) {
   const supabase = getSupabase();
   let body: MeshyTask;
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
 
   const { id: taskId, status, model_urls, thumbnail_url } = body;
 
-  // Find the dish with this Meshy task ID
+  // Find the dish linked to this Meshy task
   const { data: dish, error: dishError } = await supabase
     .from("dishes")
     .select("id, restaurant_id")
@@ -35,7 +39,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (dishError || !dish) {
-    // Task not linked to any dish — ignore (could be a test webhook)
+    // Task not linked to any dish — ignore
     return NextResponse.json({ ok: true });
   }
 
@@ -44,7 +48,6 @@ export async function POST(request: NextRequest) {
       .from("dishes")
       .update({ model_status: "failed" })
       .eq("id", dish.id);
-
     return NextResponse.json({ ok: true });
   }
 
@@ -53,30 +56,49 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  // Download GLB + USDZ from Meshy and store in Supabase Storage
-  // Meshy URLs expire in 3 days, so we must do this immediately
-  const [glbUrl, usdzUrl, posterUrl] = await Promise.all([
-    uploadModelFromUrl(dish.restaurant_id, dish.id, model_urls.glb, "glb"),
-    uploadModelFromUrl(dish.restaurant_id, dish.id, model_urls.usdz, "usdz"),
-    thumbnail_url
-      ? uploadThumbnailFromUrl(dish.restaurant_id, dish.id, thumbnail_url)
-      : Promise.resolve(null),
-  ]);
+  const meshyGlbUrl = model_urls.glb;
+  const meshyUsdzUrl = model_urls.usdz;
+  const meshyThumbnailUrl = thumbnail_url ?? null;
 
-  const { error: updateError } = await supabase
+  const finalGlbUrl = getPublicUrl(BUCKETS.MODELS, `${dish.restaurant_id}/${dish.id}/model.glb`);
+  const finalUsdzUrl = getPublicUrl(BUCKETS.MODELS, `${dish.restaurant_id}/${dish.id}/model.usdz`);
+  const finalThumbnailUrl = meshyThumbnailUrl
+    ? getPublicUrl(BUCKETS.PHOTOS, `${dish.restaurant_id}/${dish.id}/thumbnail.png`)
+    : null;
+
+  // Mark succeeded immediately with Meshy's CDN URLs — don't block on upload
+  await supabase
     .from("dishes")
     .update({
-      glb_url: glbUrl,
-      usdz_url: usdzUrl,
-      poster_url: posterUrl,
+      glb_url: meshyGlbUrl,
+      usdz_url: meshyUsdzUrl,
+      poster_url: meshyThumbnailUrl,
       model_status: "succeeded",
     })
     .eq("id", dish.id);
 
-  if (updateError) {
-    console.error("Failed to update dish after model generation:", updateError);
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
-  }
+  // Background: migrate files from Meshy CDN → Supabase Storage
+  after(async () => {
+    try {
+      await Promise.all([
+        uploadModelFromUrl(dish.restaurant_id, dish.id, meshyGlbUrl, "glb"),
+        uploadModelFromUrl(dish.restaurant_id, dish.id, meshyUsdzUrl, "usdz"),
+        meshyThumbnailUrl
+          ? uploadThumbnailFromUrl(dish.restaurant_id, dish.id, meshyThumbnailUrl)
+          : Promise.resolve(null),
+      ]);
+      await supabase
+        .from("dishes")
+        .update({
+          glb_url: finalGlbUrl,
+          usdz_url: finalUsdzUrl,
+          ...(finalThumbnailUrl ? { poster_url: finalThumbnailUrl } : {}),
+        })
+        .eq("id", dish.id);
+    } catch (err) {
+      console.error("[meshy/webhook] Background upload failed:", err);
+    }
+  });
 
   return NextResponse.json({ ok: true });
 }
