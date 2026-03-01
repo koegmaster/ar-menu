@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getTask } from "@/lib/meshy";
 import { uploadModelFromUrl, uploadThumbnailFromUrl } from "@/lib/storage";
+import { requireAuth } from "@/lib/auth";
 
 function getSupabase() {
   return createClient(
@@ -13,6 +14,9 @@ function getSupabase() {
 // GET /api/meshy/task?dishId=xxx
 // Polls Meshy directly for the task status and processes it if done
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const supabase = getSupabase();
   const { searchParams } = new URL(request.url);
   const dishId = searchParams.get("dishId");

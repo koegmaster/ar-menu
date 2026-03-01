@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "@/lib/auth";
 
 function getSupabase() {
   return createClient(
@@ -38,6 +39,9 @@ export async function GET(request: NextRequest) {
 // JSON: { name, description?, price?, restaurantId }
 // Photos are uploaded directly from the browser — see POST /api/dishes/[id]/photos
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const supabase = getSupabase();
   const body = await request.json();
 

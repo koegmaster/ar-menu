@@ -26,7 +26,31 @@ export async function middleware(request: NextRequest) {
   );
 
   // Refresh session so it doesn't expire while user is active
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  // Protect all /admin routes except the login page itself
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isLoginPage = pathname === "/admin/login";
+
+  if (isAdminRoute && !isLoginPage && !user) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/admin/login";
+    // Preserve the original destination so we can redirect back after login
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // If already logged in and hitting the login page, redirect to admin dashboard
+  if (isLoginPage && user) {
+    const adminUrl = request.nextUrl.clone();
+    adminUrl.pathname = "/admin";
+    adminUrl.searchParams.delete("next");
+    return NextResponse.redirect(adminUrl);
+  }
 
   return supabaseResponse;
 }

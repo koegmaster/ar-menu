@@ -1,10 +1,23 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import LogoutButton from "@/components/LogoutButton";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Server-side auth check — belt-and-suspenders alongside middleware
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/admin/login");
+  }
+
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Sidebar */}
@@ -42,6 +55,12 @@ export default function AdminLayout({
             QR Codes
           </Link>
         </nav>
+
+        {/* Footer: signed-in user + logout */}
+        <div className="p-3 border-t border-gray-100">
+          <p className="px-3 py-1 text-xs text-gray-400 truncate mb-1">{user.email}</p>
+          <LogoutButton />
+        </div>
       </aside>
 
       {/* Main content */}

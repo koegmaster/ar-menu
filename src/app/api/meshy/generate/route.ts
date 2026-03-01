@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createMultiImageTask } from "@/lib/meshy";
+import { requireAuth } from "@/lib/auth";
 
 function getSupabase() {
   return createClient(
@@ -12,6 +13,9 @@ function getSupabase() {
 // POST /api/meshy/generate
 // Body: { dishId: string }
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   const supabase = getSupabase();
   const { dishId } = await request.json();
 
