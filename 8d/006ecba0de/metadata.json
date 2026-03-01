@@ -5,6 +5,7 @@
   "branch": "main",
   "checkpoints_count": 0,
   "files_touched": [
+    "src/app/admin/(protected)/dishes/[id]/GenerateButton.tsx",
     "src/app/admin/(protected)/dishes/[id]/page.tsx",
     "src/components/ModelStatusPoller.tsx"
   ],
@@ -15,6 +16,13 @@
       "context": "/8d/006ecba0de/0/context.md",
       "content_hash": "/8d/006ecba0de/0/content_hash.txt",
       "prompt": "/8d/006ecba0de/0/prompt.txt"
+    },
+    {
+      "metadata": "/8d/006ecba0de/1/metadata.json",
+      "transcript": "/8d/006ecba0de/1/full.jsonl",
+      "context": "/8d/006ecba0de/1/context.md",
+      "content_hash": "/8d/006ecba0de/1/content_hash.txt",
+      "prompt": "/8d/006ecba0de/1/prompt.txt"
     }
   ],
   "token_usage": {
