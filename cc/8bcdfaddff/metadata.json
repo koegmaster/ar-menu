@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.4.7",
+  "checkpoint_id": "cc8bcdfaddff",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "src/app/admin/(protected)/dishes/[id]/page.tsx",
+    "src/app/api/meshy/generate/route.ts",
+    "src/components/ModelViewerInner.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/cc/8bcdfaddff/0/metadata.json",
+      "transcript": "/cc/8bcdfaddff/0/full.jsonl",
+      "context": "/cc/8bcdfaddff/0/context.md",
+      "content_hash": "/cc/8bcdfaddff/0/content_hash.txt",
+      "prompt": "/cc/8bcdfaddff/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 2888193,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1148056,
+    "output_tokens": 29231,
+    "api_call_count": 82
+  }
+}
