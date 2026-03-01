@@ -5,9 +5,6 @@ import "@google/model-viewer";
 
 interface ModelViewerInnerProps {
   glbUrl: string;
-  // usdzUrl is kept in the interface for backwards-compat but not passed to
-  // ios-src. model-viewer converts the (now pre-scaled) GLB to USDZ on the
-  // fly for iOS AR Quick Look, which correctly inherits the baked-in scale.
   usdzUrl?: string;
   posterUrl?: string;
   dishName: string;
@@ -16,6 +13,7 @@ interface ModelViewerInnerProps {
 
 export default function ModelViewerInner({
   glbUrl,
+  usdzUrl,
   posterUrl,
   dishName,
   className,
@@ -23,11 +21,12 @@ export default function ModelViewerInner({
   return (
     <model-viewer
       src={glbUrl}
+      ios-src={usdzUrl}
       poster={posterUrl}
       alt={`3D model of ${dishName}`}
       ar
       ar-modes="scene-viewer quick-look"
-      // "fixed" uses the model's authored size — the GLB has already been
+      // "fixed" uses the model's authored size — both GLB and USDZ have been
       // rescaled server-side to ~30cm so no runtime adjustment is needed.
       ar-scale="fixed"
       ar-placement="floor"

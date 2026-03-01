@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
-  uploadModelFromUrl,
+  uploadBothModelsFromUrls,
   uploadThumbnailFromUrl,
   getPublicUrl,
   BUCKETS,
@@ -81,8 +81,7 @@ export async function POST(request: NextRequest) {
   after(async () => {
     try {
       await Promise.all([
-        uploadModelFromUrl(dish.restaurant_id, dish.id, meshyGlbUrl, "glb"),
-        uploadModelFromUrl(dish.restaurant_id, dish.id, meshyUsdzUrl, "usdz"),
+        uploadBothModelsFromUrls(dish.restaurant_id, dish.id, meshyGlbUrl, meshyUsdzUrl),
         meshyThumbnailUrl
           ? uploadThumbnailFromUrl(dish.restaurant_id, dish.id, meshyThumbnailUrl)
           : Promise.resolve(null),
