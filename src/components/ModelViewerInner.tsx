@@ -26,9 +26,10 @@ export default function ModelViewerInner({
       alt={`3D model of ${dishName}`}
       ar
       ar-modes="scene-viewer quick-look"
-      // "fixed" uses the model's authored size — both GLB and USDZ have been
-      // rescaled server-side to ~30cm so no runtime adjustment is needed.
-      ar-scale="fixed"
+      // "auto" uses the model's authored size as the initial AR placement size
+      // (both GLB and USDZ are pre-scaled server-side to ~30cm), while still
+      // allowing the user to pinch-to-scale and rotate in AR.
+      ar-scale="auto"
       ar-placement="floor"
       camera-controls
       touch-action="pan-y"
