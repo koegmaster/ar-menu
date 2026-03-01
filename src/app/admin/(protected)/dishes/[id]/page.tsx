@@ -1,15 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import ModelViewer from "@/components/ModelViewer";
-import GenerateButton from "./GenerateButton";
+import ModelStatusPoller from "@/components/ModelStatusPoller";
 import type { DishWithPhotos } from "@/types/database";
-
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: "No model yet", color: "text-gray-500" },
-  processing: { label: "Generating 3D model…", color: "text-yellow-600" },
-  succeeded: { label: "3D model ready", color: "text-green-600" },
-  failed: { label: "Generation failed", color: "text-red-600" },
-};
 
 export default async function DishDetailPage({
   params,
@@ -28,7 +21,6 @@ export default async function DishDetailPage({
   if (error || !dish) return notFound();
 
   const d = dish as DishWithPhotos;
-  const status = STATUS_LABELS[d.model_status] ?? STATUS_LABELS.pending;
 
   return (
     <div className="p-8 max-w-3xl">
@@ -67,12 +59,7 @@ export default async function DishDetailPage({
 
         {/* 3D Model */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-medium text-gray-700">3D Model</h2>
-            <span className={`text-xs font-medium ${status.color}`}>
-              {status.label}
-            </span>
-          </div>
+          <h2 className="text-sm font-medium text-gray-700 mb-3">3D Model</h2>
 
           {d.model_status === "succeeded" && d.glb_url ? (
             <ModelViewer
@@ -81,23 +68,11 @@ export default async function DishDetailPage({
               posterUrl={d.poster_url ?? undefined}
               dishName={d.name}
             />
-          ) : d.model_status === "processing" ? (
-            <div className="aspect-square rounded-xl bg-yellow-50 border border-yellow-100 flex flex-col items-center justify-center gap-3">
-              <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-yellow-700 text-center px-4">
-                Generating 3D model…<br />
-                <span className="text-yellow-500 text-xs">This usually takes 2–5 minutes</span>
-              </p>
-            </div>
           ) : (
-            <div className="aspect-square rounded-xl bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-3">
-              <p className="text-sm text-gray-500 text-center px-4">
-                {d.model_status === "failed"
-                  ? "Generation failed. Try again below."
-                  : "No 3D model yet."}
-              </p>
-              <GenerateButton dishId={d.id} hasFailed={d.model_status === "failed"} />
-            </div>
+            <ModelStatusPoller
+              dishId={d.id}
+              initialStatus={d.model_status}
+            />
           )}
         </div>
       </div>
