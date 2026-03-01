@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.4.7",
+  "checkpoint_id": "1b6cccc903a5",
+  "session_id": "ses_3554bf302ffeK82CLQeFqiCZVw",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-01T20:24:23.681687Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/app/api/meshy/task/route.ts",
+    "src/app/api/meshy/webhook/route.ts"
+  ],
+  "agent": "OpenCode",
+  "turn_id": "071a956105bf",
+  "token_usage": {
+    "input_tokens": 2888193,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1148056,
+    "output_tokens": 29231,
+    "api_call_count": 82
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-01T20:24:23.411768Z",
+    "agent_lines": 0,
+    "human_added": 367,
+    "human_modified": 6,
+    "human_removed": 0,
+    "total_committed": 367,
+    "agent_percentage": 0
+  }
+}

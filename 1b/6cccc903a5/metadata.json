@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.4.7",
+  "checkpoint_id": "1b6cccc903a5",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/app/api/meshy/task/route.ts",
+    "src/app/api/meshy/webhook/route.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/1b/6cccc903a5/0/metadata.json",
+      "transcript": "/1b/6cccc903a5/0/full.jsonl",
+      "context": "/1b/6cccc903a5/0/context.md",
+      "content_hash": "/1b/6cccc903a5/0/content_hash.txt",
+      "prompt": "/1b/6cccc903a5/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 2888193,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1148056,
+    "output_tokens": 29231,
+    "api_call_count": 82
+  }
+}
