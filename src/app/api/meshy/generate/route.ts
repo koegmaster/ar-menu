@@ -37,9 +37,9 @@ export async function POST(request: NextRequest) {
   const photos: { photo_url: string; sort_order: number }[] =
     dish.dish_photos ?? [];
 
-  if (photos.length === 0) {
+  if (photos.length < 2) {
     return NextResponse.json(
-      { error: "Dish has no photos" },
+      { error: "At least 2 photos are required for good 3D results" },
       { status: 400 }
     );
   }

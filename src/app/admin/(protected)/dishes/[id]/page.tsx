@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import ModelViewer from "@/components/ModelViewer";
 import ModelStatusPoller from "@/components/ModelStatusPoller";
+import DishActions from "@/components/DishActions";
 import type { DishWithPhotos } from "@/types/database";
 
 export default async function DishDetailPage({
@@ -24,17 +25,7 @@ export default async function DishDetailPage({
 
   return (
     <div className="p-8 max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{d.name}</h1>
-        {d.description && (
-          <p className="text-gray-500 mt-1">{d.description}</p>
-        )}
-        {d.price != null && (
-          <p className="text-lg font-semibold text-gray-900 mt-2">
-            €{d.price.toFixed(2)}
-          </p>
-        )}
-      </div>
+      <DishActions dish={d} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Photos */}

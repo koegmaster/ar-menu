@@ -39,7 +39,7 @@ export default function NewDishPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return setError("Dish name is required");
-    if (photos.length === 0) return setError("At least 1 photo is required");
+    if (photos.length < 2) return setError("At least 2 photos are required for good 3D results");
 
     setLoading(true);
     setError(null);
@@ -182,7 +182,7 @@ export default function NewDishPage() {
 
         <button
           type="submit"
-          disabled={loading || photos.length === 0}
+          disabled={loading || photos.length < 2}
           className="w-full bg-orange-500 text-white py-3 rounded-lg text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? loadingStatus || "Creating dish…" : "Add dish & generate 3D model"}

@@ -1,4 +1,5 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { rescaleGlb } from "./rescale-glb";
 
 // Use service role for server-side storage operations
 function getAdminClient() {
@@ -57,7 +58,20 @@ export async function uploadModelFromUrl(
   if (!res.ok) {
     throw new Error(`Failed to download ${format} from Meshy: ${res.status}`);
   }
-  const buffer = await res.arrayBuffer();
+  let buffer = await res.arrayBuffer();
+
+  // Rescale GLB to plate-sized (~30cm) so AR viewers display the correct size.
+  // We bake the scale into vertex data so both Scene Viewer (Android) and
+  // AR Quick Look (iOS, via model-viewer's built-in GLB→USDZ conversion)
+  // respect the authored dimensions without any runtime adjustments.
+  if (format === "glb") {
+    try {
+      const rescaled = await rescaleGlb(new Uint8Array(buffer));
+      buffer = rescaled.buffer as ArrayBuffer;
+    } catch (err) {
+      console.error("[storage] GLB rescale failed, uploading original:", err);
+    }
+  }
 
   const contentType =
     format === "glb" ? "model/gltf-binary" : "model/vnd.usdz+zip";

@@ -9,9 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@gltf-transform/core": "^4.3.0",
+    "@gltf-transform/functions": "^4.3.0",
     "@google/model-viewer": "^4.1.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.98.0",
+    "gl-matrix": "^3.4.4",
     "next": "^15.3.4",
     "qrcode": "^1.5.4",
     "react": "^19.1.0",

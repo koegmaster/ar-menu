@@ -135,7 +135,7 @@ export default function PhotoUpload({
               {files.length}/{maxPhotos} photos — JPG or PNG
             </p>
             <p className="text-xs text-gray-400">
-              Best results: shoot from front, side, 45°, and top
+              Minimum 2 photos required — front, side, 45°, and top
             </p>
           </div>
           <input

@@ -2,13 +2,12 @@
 
 // Side-effect import — registers the <model-viewer> custom element in the browser
 import "@google/model-viewer";
-import { useEffect, useRef } from "react";
-
-// Target real-world size for a dish in AR: ~30cm (a typical dinner plate diameter)
-const TARGET_SIZE_METERS = 0.30;
 
 interface ModelViewerInnerProps {
   glbUrl: string;
+  // usdzUrl is kept in the interface for backwards-compat but not passed to
+  // ios-src. model-viewer converts the (now pre-scaled) GLB to USDZ on the
+  // fly for iOS AR Quick Look, which correctly inherits the baked-in scale.
   usdzUrl?: string;
   posterUrl?: string;
   dishName: string;
@@ -17,51 +16,20 @@ interface ModelViewerInnerProps {
 
 export default function ModelViewerInner({
   glbUrl,
-  usdzUrl,
   posterUrl,
   dishName,
   className,
 }: ModelViewerInnerProps) {
-  const ref = useRef<HTMLElement & {
-    getBoundingBoxCenter: () => { x: number; y: number; z: number };
-    getDimensions: () => { x: number; y: number; z: number };
-    scale: string;
-  }>(null);
-
-  useEffect(() => {
-    const mv = ref.current;
-    if (!mv) return;
-
-    function onLoad() {
-      if (!mv) return;
-      try {
-        const dimensions = mv.getDimensions();
-        // Use the largest horizontal/depth dimension — ignore height (y) so a
-        // tall garnish doesn't shrink the whole plate to a postage stamp.
-        const maxDim = Math.max(dimensions.x, dimensions.z);
-        if (maxDim <= 0) return;
-        const factor = TARGET_SIZE_METERS / maxDim;
-        mv.scale = `${factor} ${factor} ${factor}`;
-      } catch {
-        // getDimensions() may not be available in all model-viewer versions;
-        // fail silently and fall back to the default ar-scale="auto" behaviour.
-      }
-    }
-
-    mv.addEventListener("load", onLoad);
-    return () => mv.removeEventListener("load", onLoad);
-  }, [glbUrl]);
-
   return (
     <model-viewer
-      ref={ref as React.Ref<HTMLElement>}
       src={glbUrl}
-      ios-src={usdzUrl}
       poster={posterUrl}
       alt={`3D model of ${dishName}`}
       ar
       ar-modes="scene-viewer quick-look"
-      ar-scale="auto"
+      // "fixed" uses the model's authored size — the GLB has already been
+      // rescaled server-side to ~30cm so no runtime adjustment is needed.
+      ar-scale="fixed"
       ar-placement="floor"
       camera-controls
       touch-action="pan-y"
