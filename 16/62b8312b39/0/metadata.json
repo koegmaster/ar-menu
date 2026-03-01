@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.4.7",
+  "checkpoint_id": "1662b8312b39",
+  "session_id": "ses_3554bf302ffeK82CLQeFqiCZVw",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-01T19:04:06.846193Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "middleware.ts",
+    "src/app/admin/layout.tsx",
+    "src/app/admin/login/page.tsx",
+    "src/app/api/dishes/[id]/photos/route.ts",
+    "src/app/api/dishes/route.ts",
+    "src/app/api/meshy/generate/route.ts",
+    "src/app/api/meshy/task/route.ts",
+    "src/components/LogoutButton.tsx",
+    "src/components/ModelViewerInner.tsx",
+    "src/lib/auth.ts"
+  ],
+  "agent": "OpenCode",
+  "turn_id": "878fda508d69",
+  "token_usage": {
+    "input_tokens": 694415,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 492016,
+    "output_tokens": 13253,
+    "api_call_count": 35
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-01T19:04:06.716216Z",
+    "agent_lines": 293,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 293,
+    "agent_percentage": 100
+  }
+}
