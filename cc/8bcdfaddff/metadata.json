@@ -5,9 +5,18 @@
   "branch": "main",
   "checkpoints_count": 0,
   "files_touched": [
+    ".opencode/plans/ar-scaling-and-photo-minimum.md",
+    "package-lock.json",
+    "package.json",
     "src/app/admin/(protected)/dishes/[id]/page.tsx",
+    "src/app/admin/(protected)/dishes/new/page.tsx",
+    "src/app/api/dishes/[id]/route.ts",
     "src/app/api/meshy/generate/route.ts",
-    "src/components/ModelViewerInner.tsx"
+    "src/components/DishActions.tsx",
+    "src/components/ModelViewerInner.tsx",
+    "src/components/PhotoUpload.tsx",
+    "src/lib/rescale-glb.ts",
+    "src/lib/storage.ts"
   ],
   "sessions": [
     {
@@ -16,6 +25,13 @@
       "context": "/cc/8bcdfaddff/0/context.md",
       "content_hash": "/cc/8bcdfaddff/0/content_hash.txt",
       "prompt": "/cc/8bcdfaddff/0/prompt.txt"
+    },
+    {
+      "metadata": "/cc/8bcdfaddff/1/metadata.json",
+      "transcript": "/cc/8bcdfaddff/1/full.jsonl",
+      "context": "/cc/8bcdfaddff/1/context.md",
+      "content_hash": "/cc/8bcdfaddff/1/content_hash.txt",
+      "prompt": "/cc/8bcdfaddff/1/prompt.txt"
     }
   ],
   "token_usage": {

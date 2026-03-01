@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.4.7",
+  "checkpoint_id": "cc8bcdfaddff",
+  "session_id": "ses_35cebb0d2ffeKu6Q929nSTZsjd",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-01T20:09:02.994726Z",
+  "branch": "main",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "package-lock.json",
+    "package.json",
+    "src/app/admin/(protected)/dishes/[id]/page.tsx",
+    "src/app/admin/(protected)/dishes/new/page.tsx",
+    "src/app/api/dishes/[id]/route.ts",
+    "src/components/DishActions.tsx",
+    "src/components/ModelViewerInner.tsx",
+    "src/components/PhotoUpload.tsx",
+    ".opencode/plans/ar-scaling-and-photo-minimum.md",
+    "src/app/api/meshy/generate/route.ts",
+    "src/lib/rescale-glb.ts",
+    "src/lib/storage.ts"
+  ],
+  "agent": "OpenCode",
+  "turn_id": "a688cb4199a3",
+  "checkpoint_transcript_start": 13,
+  "transcript_lines_at_start": 13,
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-01T20:09:02.956573Z",
+    "agent_lines": 808,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 808,
+    "agent_percentage": 100
+  }
+}
